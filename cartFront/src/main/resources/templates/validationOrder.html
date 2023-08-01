@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html html="" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org" lang="en">
+<style>
+    table, th, td {
+        border: 1px solid black;
+    }
+</style>
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+    <title>TOPcar</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+</head>
+
+<body>
+
+<!-- Navbar -->
+<div class="w3-top">
+    <div class="w3-bar w3-black w3-card">
+        <a th:href="@{http://localhost:9003}" class="w3-bar-item w3-button w3-padding-large w3-hide-small">Toutes les voitures
+            miniatures/maquettes</a>
+    </div>
+</div>
+
+<!-- Page content -->
+<div class="w3-content" style="">
+    <!-- The cart section -->
+    <div class="w3-container w3-content w3-center w3-padding-64" style="" id="cart">
+        <h2 class="w3-wide">Commande confirmée !</h2>
+        <div class="w3-row w3-padding-32">
+            <div>
+                <p>Votre commande a été confirmée et arrivera très prochainement à l'adresse suivante : </p>
+                <p th:text="${address}"></p>
+                <a th:href="@{http://localhost:9003}">Retour à la liste des voitures miniatures</a>
+            </div>
+
+        </div>
+    </div>
+</div>
+</body>
+</html>

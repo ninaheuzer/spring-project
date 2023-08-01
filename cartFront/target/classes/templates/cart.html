@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html html="" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org" lang="en">
+<style>
+    table, th, td {
+        border: 1px solid black;
+    }
+</style>
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+    <title>TOPcar</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+</head>
+
+<body>
+
+<!-- Navbar -->
+<div class="w3-top">
+    <div class="w3-bar w3-black w3-card">
+        <a th:href="@{http://localhost:9003}" class="w3-bar-item w3-button w3-padding-large w3-hide-small">Toutes
+            les voitures miniatures/maquettes</a>
+        <a class="w3-bar-item w3-button w3-padding-large w3-hide-small" th:href="@{http://localhost:4200/logout}">Se déconnecter</a>
+    </div>
+</div>
+
+<!-- Page content -->
+<div class="w3-content" style="">
+    <!-- The cart section -->
+    <div class="w3-container w3-content w3-center w3-padding-64" style="" id="cart">
+        <h2 class="w3-wide">Votre panier</h2>
+        <div class="w3-row w3-padding-32">
+            <div th:if="${cart.empty}">
+                <p>Votre panier est vide pour l'instant, remplissez-le !</p>
+            </div>
+            <div th:if="${!cart.empty}">
+                <table align="center" class="table table-striped mx-auto">
+                    <tr>
+                        <th>Produit</th>
+                        <th>Quantité</th>
+                        <th>Nouvelle quantité ?</th>
+                        <th>Prix à l'unité</th>
+                        <th>Sous total</th>
+                    </tr>
+                    <div th:each="oneCart : ${cart}">
+                        <tr>
+                            <form method="post" th:action="@{/update/{id}(id=${oneCart.id})}" th:object="${updateCart}">
+                                <td th:text="${oneCart.productName}"></td>
+                                <td th:text="${oneCart.quantity}"></td>
+                                <td>
+                                    <input type="number" th:min="1" th:field="${updateCart.quantity}"/>
+                                    <button type="submit">Valider</button>
+                                </td>
+                                <td th:text="${oneCart.productPrice}+' €'"></td>
+                                <td th:text="${oneCart.quantity*oneCart.productPrice}+' €'"></td>
+                                <input type="hidden" th:field="${updateCart.id}"/>
+                                <input type="hidden" th:field="${updateCart.idProduct}"/>
+                                <input type="hidden" th:field="${updateCart.idUser}"/>
+                            </form>
+                            <td>
+                                <form method="post" th:action="@{/delete/{id}(id=${oneCart.id})}">
+                                    <button type="submit">Supprimer du panier</button>
+                                </form>
+                            </td>
+                        </tr>
+                    </div>
+                    <tr>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td>Prix total :</td>
+                        <td th:text="${totalPrice}+' €'"></td>
+                    </tr>
+                </table>
+                <a th:align="right" th:href="@{/validationOrder/{id}(id=${cart[0].idUser})}">
+                    <button>Commander !</button>
+                </a>
+            </div>
+
+        </div>
+    </div>
+</div>
+</body>
+</html>
