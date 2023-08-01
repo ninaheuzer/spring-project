@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Liste des utilisateurs</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+</head>
+<body>
+<nav class="navbar fixed-top navbar-light bg-light">
+    <div class="container">
+        <a class="navbar-brand" href="http://localhost:9003">Accueil</a>
+        <a class="nav-link" href="/">Accueil connexion</a> <a th:if="${connected_id != null}" class="nav-link"
+                                                              th:href="@{/account}">Mon compte</a>
+        <a th:if="${connected_id != null}" class="nav-link" th:href="@{'http://localhost:9002/' + ${connected_id}}">Mon panier</a>
+        <a th:if="${connected_id != null}" class="nav-link" th:href="@{/logout}">Se déconnecter</a>
+    </div>
+</nav>
+
+<div class="container mx-auto align-content-center text-center" style="margin: 10%">
+    <div th:if="${users.empty}">
+        <p class="alert">Pas d'utilisateur dans la database
+        <p>
+    </div>
+
+    <h1 th:if="${message != null}" th:text="${message}"></h1>
+
+    <div th:if="${!users.empty}">
+        <h1>
+            Tous les utilisateurs:
+        </h1>
+
+        <table class="table table-striped mx-auto">
+            <tr>
+                <th>Id</th>
+                <th>Prénom</th>
+                <th>Nom</th>
+                <th>pseudo</th>
+                <th>Date de naissance</th>
+                <th>Adresse</th>
+                <th>Email</th>
+                <th>Rôle</th>
+                <th>Actions</th>
+            </tr>
+            <div th:each="user:${users}">
+                <tr>
+                    <td th:text="${user.id}"></td>
+                    <td th:text="${user.firstName}"></td>
+                    <td th:text="${user.lastName}"></td>
+                    <td th:text="${user.pseudo}"></td>
+                    <td th:text="${user.birthday}"></td>
+                    <td th:text="${user.address}"></td>
+                    <td th:text="${user.email}"></td>
+                    <td th:text="${user.userType}"></td>
+                    <td th:if="${!#strings.equals(connected_id, user.id)}">
+                        <a th:href="@{'/delete/' + ${user.id}}" style="text-decoration: none">
+                            <button class="btn btn-danger">Supprimer</button>
+                        </a>
+                        <a th:href="@{'/toggleStatus/' + ${user.id}}" style="text-decoration: none">
+                            <button th:if="${#strings.equals(user.userType, 'CLIENT')}" class="btn btn-primary">Admin
+                            </button>
+                            <button th:if="${#strings.equals(user.userType, 'ADMIN')}" class="btn btn-primary">Client
+                            </button>
+                        </a>
+                    </td>
+                    <td th:if="${#strings.equals(connected_id, user.id)}">
+                        It's you :-)
+                    </td>
+                </tr>
+            </div>
+        </table>
+    </div>
+</div>
