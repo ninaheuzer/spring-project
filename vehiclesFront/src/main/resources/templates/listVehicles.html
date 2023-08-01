@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html html="" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org" lang="en"><head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8"><title>Vehicles</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.min.js"
+            integrity="sha384-QJHtvGhmr9XOIpI6YVutG+2QOK9T+ZnN4kzFN1RtK3zEFEIsxhlmWl5/YESvpZ13"
+            crossorigin="anonymous"></script>
+</head><body>
+
+<!-- Navbar -->
+<nav class="navbar fixed-top navbar-light bg-light">
+    <div class="container">
+        <a class="navbar-brand" href="#vehicles">Accueil</a>
+        <a href="#filter" class="navbar-brand">Filter</a>
+        <div th:if="${connected == null}" class="d-flex flex-wrap justify-content-end">
+            <a class="nav-link" th:href="@{'http://localhost:4200/login'}">Se connecter </a>
+            <a class="nav-link" th:href="@{'http://localhost:4200/signin'}">S'inscrire </a>
+        </div>
+        <a th:if="${admin != null}" href="#create" class="nav-link">Add a vehicle</a>
+        <div th:if="${connected != null}" class="d-flex flex-wrap justify-content-end">
+            <a class="nav-link" th:href="@{'http://localhost:4200/account/'}">Mon compte</a>
+            <a class="nav-link" th:href="@{'http://localhost:9002/' + ${connected}}">Mon panier</a>
+            <a class="nav-link" th:href="@{'http://localhost:4200/logout'}">Se déconnecter</a>
+        </div>
+    </div>
+</nav>
+
+<!-- Page content -->
+
+<div class="w3-black" id="filter">
+    <div class="w3-container w3-content w3-padding-64" style="">
+        <form class="w3-ul w3-border w3-white w3-text-grey" method="get" th:action="@{/}" th:object="${vehicleDTO}">
+            <p class="w3-rest w3-row-padding"style=""><input type="number" step="0.01" style="" class="w3-padding" placeholder="Prix minimum" th:field="*{minPrice}"></p>
+            <p class="w3-rest w3-row-padding" style=""><input type="number" step="0.01" style="" class="w3-padding" placeholder="Prix maximum" th:field="*{maxPrice}"></p>
+            <p class="w3-rest w3-row-padding" style=""><input type="text" style="" class="w3-padding" placeholder="Category" th:field="*{category}"></p>
+            <select class="w3-row-padding" style="" th:field="*{tri}">
+                <option value="" style="" class="w3-padding">--Choisissez une méthode de tri--</option>
+                <option value="decroissant" style="" class="w3-padding">Décroissant</option>
+                <option value="croissant" style="" class="w3-padding">Croissant</option>
+            </select>
+            <p class="w3-row-padding"><input class="w3-btn w3-black" type="submit" value="Filtrer"></p>
+        </form>
+    </div>
+</div>
+
+<div class="w3-content" style="">
+    <!-- The cars Section -->
+    <div class="w3-container w3-content w3-center w3-padding-64" style="" id="vehicles">
+        <h2 class="w3-wide">Vehicles</h2>
+        <p class="w3-opacity"><i>Small or big vehicles !</i></p>
+        <div class="w3-row w3-padding-32">
+            <div th:if="${vehicles.empty}">
+                <p>No vehicles in database. That's strange !</p>
+            </div>
+            <div class="w3-third" th:each="v : ${vehicles}">
+               <p th:text="${v.getName()}">NAME</p>
+                <p th:text="${v.getPrice()}">PRICE</p>
+                <p th:text="${v.getBrief_description()}">BRIEF DESCRIPTION</p>
+                <!-- add admin filter -->
+                <a th:href="@{'http://localhost:9004/vehicle/' + ${v.getId()} + '/details'}"><button class="w3-btn w3-black">DÉTAILS</button></a>
+                <div th:if="${admin != null}">
+                    <a th:href="@{'http://localhost:9004/vehicle/' + ${v.getId()} + '/edit'}"><button class="w3-btn w3-black">UPDATE</button></a>
+                    <a th:href="@{/{id}(id=${v.getId()})}"><button class="w3-btn w3-red">X</button></a>
+                </div>
+                </div>
+        </div>
+    </div>
+</div>
+
+<!-- add admin filter here -->
+<div th:if="${admin != null}" class="w3-black" id="create">
+    <div class="w3-container w3-content w3-padding-64" style="">
+        <h2 class="w3-wide w3-center">ADD YOURS</h2>
+        <p class="w3-opacity w3-center"><i>Add your own vehicle here ! </i></p><br>
+
+        <form class="w3-ul w3-border w3-white w3-text-grey" method="post" th:action="@{/}" th:object="${vehicle}">
+            <p class="w3-rest w3-row-padding" style=""><input type="text" style="" class="w3-padding" placeholder="Name" th:field="*{name}"></p>
+            <p class="w3-rest w3-row-padding" style=""><input type="text" style="" class="w3-padding" placeholder="Brief description" th:field="*{brief_description}"></p>
+            <p class="w3-rest w3-row-padding" style=""><input type="text" style="" class="w3-padding" placeholder="Detailed description" th:field="*{detailed_description}"></p>
+            <p class="w3-rest w3-row-padding" style=""><input type="number" step="0.01" style="" class="w3-padding" placeholder="Price" th:field="*{price}"></p>
+            <p class="w3-rest w3-row-padding" style=""><input type="text" style="" class="w3-padding" placeholder="Category" th:field="*{category}"></p>
+            <p class="w3-row-padding"><input class="w3-btn w3-black" type="submit" value="SUBMIT"></p>
+        </form>
+    </div>
+</div>
+</div>
+
+
+
+</body></html>
