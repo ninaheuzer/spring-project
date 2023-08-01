@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Details Page</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.10.2/dist/umd/popper.min.js"
+            integrity="sha384-7+zCNj/IqJ95wo16oMtfsKbZ9ccEh31eOz1HGyDuCQ6wgnyJNSYdrPa03rtR1zdB"
+            crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.min.js"
+            integrity="sha384-QJHtvGhmr9XOIpI6YVutG+2QOK9T+ZnN4kzFN1RtK3zEFEIsxhlmWl5/YESvpZ13"
+            crossorigin="anonymous"></script>
+</head>
+<body>
+<nav class="navbar fixed-top navbar-light bg-light">
+    <div class="container">
+        <a class="navbar-brand" href="/">Accueil</a>
+        <div th:if="${current_user == null}" class="d-flex flex-wrap justify-content-end">
+            <a class="nav-link" th:href="@{/login}">Se connecter </a>
+            <a class="nav-link" th:href="@{/signin}">S'inscrire </a>
+        </div>
+        <div th:if="${current_user != null}" class="d-flex flex-wrap justify-content-end">
+            <a class="nav-link" th:href="@{/account}">Mon compte</a>
+            <a class="nav-link" th:href="@{/cart/{id}(id=${current_user.getId()})}">Mon panier</a>
+            <a class="nav-link" th:href="@{/logout}">Se déconnecter</a>
+        </div>
+    </div>
+</nav>
+
+<div th:if="${vehicle == null}">
+    <div class="container mx-auto align-content-center text-center" style="margin: 10%">
+        <p>Il semble que le vehicule que vous recherchez n'existe pas :/</p>
+        <br>
+        <a class="btn btn-primary" href="/">Retourner voir les autres vehicules</a>
+    </div>
+</div>
+
+<div class="container mx-auto align-content-center mt-4 pt-4" th:if="${vehicle != null}">
+
+    <div class="row pt-4">
+        <h2 class="col-8" th:text="${vehicle.getName()}">
+            [Name of vehicle]
+        </h2>
+        <div th:if="${current_user != null && current_user.isAdmin()}"
+             class="col-4 d-flex flex-wrap justify-content-end">
+            <a class="btn btn-secondary mx-2" th:href="@{/vehicle/{id}/edit(id=${vehicle.getId()})}">Modifier</a>
+            <a class="btn btn-danger" th:href="@{/vehicle/{id}/delete(id=${vehicle.getId()})}">Supprimer</a>
+        </div>
+    </div>
+    <hr>
+    <div class="row" id="mainDetail">
+        <div class="col-8">
+            <ul>
+                <li>Name : <span th:text="${vehicle.getName()}">[name]</span></li>
+                <li>Description : <span th:text="${vehicle.getDetailed_description()}">[detailed_description]</span>
+                </li>
+                <li>Catégorie : <span th:text="${vehicle.getCategory()}">[category]</span></li>
+                <li th:if="${note_average != -1}">Note : <span th:text="${note_average}">[mean notes]</span> / 5</li>
+                <li th:if="${note_average == -1}">Note : Encore aucune note n'a été donnée</li>
+            </ul>
+        </div>
+        <div class="col-4">
+            Prix : <span th:text="${vehicle.getPrice()}">[prix]</span><br/>
+            <div class=" mt-2 row" th:if="${current_user != null}">
+                <form th:action="@{/cart}" method="post" th:object="${cart}">
+                    <div class="input-group mb-1">
+                        <span class="input-group-text" id="basic-addon1">Quantité</span>
+                        <input type="number" min="1" max="10" step="1" class="form-control" th:field="*{quantity}" />
+                    </div>
+                    <input type="hidden" th:field="*{idProduct}">
+                    <input type="hidden" th:field="*{idUser}">
+                    <button type="submit" class="btn btn-success mt-2">Ajouter au panier</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="row mt-4" id="comments">
+        <div class="row">
+            <h4 class="col"><u>Commentaires (<span th:text="${#lists.size(comments)}">[nombre de commentaires]</span>) :</u>
+            </h4>
+            <button th:if="${current_user != null}" class="btn btn-success mb-3 col" type="button"
+                    data-bs-toggle="collapse" data-bs-target="#newCommentCollapse"
+                    aria-expanded="false" aria-controls="newCommentCollapse">
+                Ajouter un commentaire
+            </button>
+        </div>
+
+
+        <!-- Rajouter un formulaire d'ajout de commentaire ?-->
+        <div class="collapse" id="newCommentCollapse" th:if="${current_user != null}">
+            <div class="row mx-1">
+                <form method="post" th:action="@{/comment}" th:object="${new_comment}" class="container">
+                    <h5>Ajouter un commentaire:</h5>
+                    <div class="row">
+                        <label for="inputText" class="col-sm-2 col-form-label">Text</label>
+                        <textarea class="form-control" id="inputText" th:field="*{text}" cols="75"
+                                  rows="4" maxlength="255" th:required="required" placeholder="Votre commentaire">
+                        </textarea>
+                    </div>
+                    <div class="row">
+                        <label for="inputRating" class="col-sm-2 col-form-label">Note</label>
+                        <input id="inputRating" type="number" max="5" min="0" step="1" th:field="*{rating}"
+                               th:required="required">
+                    </div>
+                    <input type="hidden" th:field="*{vehicleId}">
+                    <div class="mt-3 d-flex flex-wrap justify-content-end">
+                        <input type="reset" class="btn btn-danger" value="Reset"/>
+                        <input type="submit" class="btn btn-success mx-2" value="Publier le commentaire"/>
+                    </div>
+                    <hr>
+                </form>
+            </div>
+        </div>
+
+
+        <div th:if="${comments.empty}" class="mt-2">
+            <p>Aucun commentaire</p>
+        </div>
+        <!-- Rajouter un formulaire d'ajout de commentaire ?-->
+
+        <div th:each="comment : ${comments}">
+            <div class="card mb-3">
+                <div class="card-header">
+                    <div class="row align-items-center">
+                        <div class="col">
+                            <span th:text="${comment.getPseudo()}">[User name]</span> : <span
+                                th:text="${comment.getRating()}">[Note de l'évaluation]</span> / 5
+                        </div>
+                        <div th:if="${current_user != null && (current_user.isAdmin() || current_user.getId() == comment.getUserId())}"
+                             class="col d-flex flex-wrap justify-content-end">
+                            <a th:if="${current_user.getId() == comment.getUserId()}" class="btn btn-secondary mx-2"
+                               th:href="@{/comment/{id}/edit(id=${comment.getId()})}">
+                                Modifier commentaire
+                            </a>
+                            <a class="btn btn-danger" th:href="@{/comment/{id}/delete(id=${comment.getId()})}">
+                                Supprimer commentaire
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <p class="card-text" th:text="${comment.getText()}">[comment text]</p>
+                </div>
+                <div class="card-footer text-muted" th:text="${comment.getCreationDate()}">
+                    [creation date]
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,1 @@
+INSERT INTO vehicles(id, name, brief_description, detailed_description, price, category) VALUES (1, 'Porsche 911', 'The most famous Porsche model', 'The Porsche 911 (pronounced Nine Eleven or in German: Neunelfer) is a two-door 2+2 high performance rear-engined sports car introduced in September 1964 by Porsche AG of Stuttgart, Germany.', 49999.99, 'ma catégorie');
